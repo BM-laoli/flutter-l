@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+import 'package:my_appls/templateProject/routers/routers.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+
+import 'controller.dart';
+
+class CounterPage extends StatelessWidget {
+  final controller = Get.find<CounterController>();
+  final state = Get.find<CounterController>().state;
+
+  @override
+  Widget build(BuildContext context) {
+    ScreenUtil.init(Get.context!, designSize: const Size(360, 690));
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Test"),
+      ),
+      body: GetBuilder<CounterController>(builder: (controller) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Text("${SR.hello.tr} : ${state.count}", style: TextStyle(fontSize: 50.sp),),
+              ElevatedButton(
+                  onPressed: () => controller.login("123456"),
+                  child: const Text("正常登录")),
+              ElevatedButton(
+                  onPressed: () => controller.loginError(true),
+                  child: const Text("错误登录")),
+              Text(
+                "登录用户：${state.user?.username ?? ""}",
+                style: TextStyle(fontSize: 20.sp),
+              ),
+              ElevatedButton(
+                  onPressed: () => controller.loginError(false),
+                  child: const Text("异常处理 返回 false")),
+              ElevatedButton(
+                  onPressed: () => controller.loginError(true),
+                  child: const Text("异常处理 返回 true")),
+              Text(
+                "错误信息：${state.errorMessage ?? ""}",
+                style: TextStyle(fontSize: 20.sp),
+              ),
+              ElevatedButton(
+                  onPressed: () => controller.loginLoading(true),
+                  child: const Text("显示loading")),
+              ElevatedButton(
+                  onPressed: () => controller.loginLoading(false),
+                  child: const Text("不显示loading")),
+              ElevatedButton(
+                  onPressed: () => controller.switchApi(),
+                  child: const Text("切换环境")),
+              ElevatedButton(onPressed: () {
+                Get.toNamed(RouteGet.article);
+              }, child: const Text("Go List Page"))
+            ],
+          ),
+        );
+      }),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => controller.increase(),
+      ),
+    );
+  }
+}
