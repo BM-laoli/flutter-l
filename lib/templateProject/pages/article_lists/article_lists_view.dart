@@ -13,14 +13,11 @@ class ArticleListsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("文章列表"),
-      ),
-      body: buildRefreshListWidget<Article, ArticleListsController>(
-          itemBuilder: (item, index) {
-        return _buildItem(item);
-      }),
-    );
+        body:
+        buildRefreshListWidget<Article, ArticleListsController>(
+            itemBuilder: (item, index) {
+      return _buildItem(item);
+    }));
   }
 
   Card _buildItem(Article item) {
@@ -94,9 +91,8 @@ class ArticleListsPage extends StatelessWidget {
             ),
             ElevatedButton(
                 onPressed: () {
-                  Get.toNamed(RouteGet.articleDetails, arguments: {
-                    "article":item
-                  });
+                  Get.toNamed(RouteGet.articleDetails,
+                      arguments: {"article": item});
                 },
                 child: const Text("Detail"))
           ],

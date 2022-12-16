@@ -8,6 +8,7 @@ import 'package:my_appls/templateProject/mainde.dart';
 void  main () async {
   await ScreenUtil.ensureScreenSize();
   runApp(const TemplateProject());
+  // runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -30,7 +31,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-        title: 'flutter demno',
         home:Scaffold(
           appBar: AppBar(
             title: const Text('FLutter Demo'),
@@ -39,7 +39,6 @@ class MyApp extends StatelessWidget {
             children: [BlueBox()],
           ),
         ),
-
     );
   }
 }
