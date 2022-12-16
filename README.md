@@ -25,3 +25,24 @@ flutter run
 
 > 就来讲讲道理，全部的文件都应该收敛到templayeProject 目录下，但是由于用来一些pluging都是项目级别的setting ，我就没有去改他们的设置了
 > module& generated.json & res/string_res 为了配合 IDE插件和 sdk要求，就统统放在外面了
+
+
+## 疑难杂症
+
+1. 关于 webview_flutter的问题，我看一下，既然它的lib中写的android gralod 写目标是32 最低是19，那么我就使用它提供的版本去配置了
+
+```
+android {
+    //    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 32
+    //....
+    defaultConfig {
+      minSdkVersion 19
+      targetSdkVersion 32
+    }
+}
+
+```
+这样问题就处理了
+
+2. 关于找不到ios 模拟器，无法识别的问题，请使用最新的Xcode13，被逼无奈还是得升级catlina 系统 
