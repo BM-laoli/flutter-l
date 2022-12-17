@@ -9,6 +9,5 @@ class ArticleListsBinding extends Bindings {
   void dependencies() {
     Get.lazyPut(() => ArticleListsController());
     Get.lazyPut(() => ApiService());
-    Get.lazyPut(() => DrawStateLogic());
   }
 }

@@ -1,47 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:my_appls/templateProject/pages/article_details/article_details_view.dart';
 import 'package:my_appls/templateProject/pages/article_lists/article_lists_view.dart';
-import 'package:my_appls/templateProject/routers/routers.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:my_appls/templateProject/routers/routers.dart';
 
 import 'controller.dart';
 
-class DrawStateLogic extends GetxController {
-  final BuildContext? _context;
-  setContext(BuildContext _context) {
-    this._context = _context;
-  }
+/// 自定义广播通知，处理draw事件
 
-  openDraw() {
-    if(this._context != null) {
-      Scaffold.of(this._context!).openDrawer();
-    }
-  }
+enum EnumDrawEvent {
+  open,
+  close
+}
+
+class DrawStateNotification extends Notification {
+  DrawStateNotification(this.msg);
+  final EnumDrawEvent msg;
 }
 
 class HomePage extends StatelessWidget {
-  final drawStateLogic = Get.put<DrawStateLogic>(DrawStateLogic(),
-      tag: 'DrawStateLogic', permanent: true);
+  const HomePage({super.key});
+
+  bool onDrawChange(DrawStateNotification notification, BuildContext ctx) {
+    if (notification.msg == EnumDrawEvent.open) {
+      Scaffold.of(ctx).openDrawer();
+    }
+
+    if (notification.msg == EnumDrawEvent.close) {
+      Scaffold.of(ctx).closeDrawer();
+    }
+
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
-    drawStateLogic.setContext(context);
-    // TODO: implement build
     return SafeArea(
-        bottom: false,
-        child: Scaffold(
-          bottomNavigationBar: NavigationHomePage(),
-          drawer: const Drawer(
-            child: Center(
-              child: Text('data'),
-            ),
-          ),
-        ));
+      bottom: false,
+      child: Scaffold(
+        bottomNavigationBar: Builder(builder: (ctx) {
+          /// 注意Scaffold 中ctx 和 上层的 ctx 不是同一个东西
+          return NotificationListener<DrawStateNotification>(
+            onNotification: (notification) => onDrawChange(notification, ctx),
+            child: const NavigationHomePage(),
+          );
+        }),
+        drawer: Builder(builder: (ctx) {
+          return NotificationListener<DrawStateNotification>(
+              onNotification: (notification) => onDrawChange(notification, ctx),
+              child: const DrawPage());
+        }),
+      ),
+    );
   }
 }
 
+/// NavigationHomePageBottom
 class NavigationHomePage extends StatefulWidget {
+  const NavigationHomePage({super.key});
+
   @override
   State<StatefulWidget> createState() => _NavigationHomePageState();
 }
@@ -75,10 +92,29 @@ class _NavigationHomePageState extends State<NavigationHomePage>
   }
 }
 
+/// DrawPage
+class DrawPage extends StatelessWidget {
+  const DrawPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Drawer(
+        child: Center(
+      child: ElevatedButton(
+        child: const Text('222'),
+        onPressed: () {
+          Get.toNamed(RouteGet.pageX);
+          DrawStateNotification(EnumDrawEvent.close).dispatch(context);
+        },
+      ),
+    ));
+  }
+}
+
 class CounterPage extends StatelessWidget {
   final controller = Get.find<CounterController>();
   final state = Get.find<CounterController>().state;
-  final drawStateLogic = Get.find<DrawStateLogic>();
 
   @override
   Widget build(BuildContext context) {
@@ -122,9 +158,7 @@ class CounterPage extends StatelessWidget {
             ElevatedButton(
                 onPressed: () {
                   // Get.toNamed(RouteGet.pageX);
-                  // Scaffold.of(context).openDrawer();
-                  // Scaffold? sca = context.findAncestorWidgetOfExactType<Scaffold>();
-                  drawStateLogic.openDraw();
+                  DrawStateNotification(EnumDrawEvent.open).dispatch(context);
                 },
                 child: const Text("Go List Page"))
           ],
