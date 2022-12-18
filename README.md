@@ -140,6 +140,90 @@ class HomePage extends StatelessWidget {
 
 ```
 
+### 关于Appbar高度和 SafeAre 不适配的问题
+> 这里的主要的问题就是两个东西配合起来用 不合适，总是会导致 AppBar 太高，于是我想了个办法 **SafeAre 并不是App全局都需要，而是给需要的东西加就好了**
+> 不需要的东西不需要加；然后我只是加到了 ，MainPage上，把高度取了，但是底边还是一样有问题，于是直接给他加了个高度
+
+```dart
+
+/// NavigationHomePageBottom
+class NavigationHomePage extends StatefulWidget {
+  const NavigationHomePage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _NavigationHomePageState();
+}
+
+class _NavigationHomePageState extends State<NavigationHomePage>
+    with SingleTickerProviderStateMixin {
+  late TabController controller = TabController(length: 2, vsync: this);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        bottomNavigationBar: Material(
+          color: Colors.blue,
+          child: TabBar(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 25),
+            tabs: const <Tab>[
+              Tab(
+                icon: Icon(Icons.person),
+              ),
+              Tab(
+                icon: Icon(Icons.email),
+              ),
+            ],
+            controller: controller,
+          ),
+        ),
+        body: TabBarView(
+          controller: controller,
+          children: [CounterPage(), ArticleListsPage()],
+        ));
+  }
+}
+
+
+/// main 结构
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  bool onDrawChange(DrawStateNotification notification, BuildContext ctx) {
+    if (notification.msg == EnumDrawEvent.open) {
+      Scaffold.of(ctx).openDrawer();
+    }
+
+    if (notification.msg == EnumDrawEvent.close) {
+      Scaffold.of(ctx).closeDrawer();
+    }
+
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea( /// 只有这里加Safeare 其它的Page看情况加
+      bottom: false,
+      child: Scaffold(
+        bottomNavigationBar: Builder(builder: (ctx) {
+          /// 注意Scaffold 中ctx 和 上层的 ctx 不是同一个东西
+          return NotificationListener<DrawStateNotification>(
+            onNotification: (notification) => onDrawChange(notification, ctx),
+            child: const NavigationHomePage(),
+          );
+        }),
+        drawer: Builder(builder: (ctx) {
+          return NotificationListener<DrawStateNotification>(
+              onNotification: (notification) => onDrawChange(notification, ctx),
+              child: const DrawPage());
+        }),
+      ),
+    );
+  }
+}
+
+
+```
 
 ### Draw切换的实
 > 上面也给到了 具体的实现，主要困难点还是 这个跨 组件的 Notification 
@@ -190,7 +274,7 @@ android {
 这样问题就处理了
 
 2. 关于找不到ios 模拟器，无法识别的问题，请使用最新的Xcode13，被逼无奈还是得升级catlina 系统
-3. 关于Joney自己的MacPro的启动问题，现在需要通过命令行启动，要不然无法识别到IOS模拟器， 
+3. 关于Joney自己的MacPro的启动问题，现在需要通过命令行启动，要不然无法识别到IOS模拟器，
 
 ## 总结
 1. 这个仓库 主要还是做联系用的，和学习用的，
